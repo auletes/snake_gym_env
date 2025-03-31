@@ -1,6 +1,10 @@
 import random
 import time
 from collections import deque
+from typing import TYPE_CHECKING, Any, Generic, SupportsFloat, TypeVar, Dict
+
+ObsType = TypeVar("ObsType")
+ActType = TypeVar("ActType")
 
 import cv2
 import gymnasium as gym
@@ -42,7 +46,19 @@ class SnekEnv(gym.Env):
         # Example for using image as input (channel-first; channel-last also works):
         self.observation_space = spaces.Box(low=-500, high=500, shape=(5 + SNAKE_LEN_GOAL,), dtype=np.float32)
 
-    def step(self, action):
+        # JEB: Copy paste from reset to intialize types
+        self.img = np.zeros((500, 500, 3), dtype="uint8")
+        self.snake_position = [[250, 250], [240, 250], [230, 250]]
+        self.apple_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
+        self.score = 0
+        self.prev_button_direction = 1
+        self.button_direction = 1
+        self.snake_head = [250, 250]
+        self.prev_reward = 0
+        self.done = False
+        self.prev_actions = 0
+
+    def step(self, action: ActType) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
         self.prev_actions.append(action)
         cv2.imshow("a", self.img)
         cv2.waitKey(1)
@@ -96,7 +112,7 @@ class SnekEnv(gym.Env):
 
         if self.done:
             self.reward = -10
-        info = {}
+        info: Dict[str, Any] = {}
 
         head_x = self.snake_head[0]
         head_y = self.snake_head[1]
@@ -112,7 +128,12 @@ class SnekEnv(gym.Env):
 
         return observation, self.reward, self.done, info
 
-    def reset(self, seed=None, options=None):
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict[str, Any] | None = None,
+    ) -> tuple[ObsType, dict[str, Any]]:  # type: ignore
         super().reset(seed=seed)  # gym requires this call to control randomness and reproduce scenarios.
 
         self.img = np.zeros((500, 500, 3), dtype="uint8")
@@ -144,6 +165,6 @@ class SnekEnv(gym.Env):
         observation = np.array(observation)
 
         # Additional info to return. For debugging or whatever.
-        info = {}
+        info: Dict[str, Any] = {}
 
         return observation, info
