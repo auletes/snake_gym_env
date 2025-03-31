@@ -1,0 +1,7 @@
+[tools.isort]
+profile = "black"
+line_length = 159
+force_to_top = ["os", "sys"]
+
+[tool.black]
+line-length = 159
