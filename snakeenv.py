@@ -1,7 +1,7 @@
 import random
 import time
 from collections import deque
-from typing import TYPE_CHECKING, Any, Generic, SupportsFloat, TypeVar, Dict
+from typing import TYPE_CHECKING, Any, Dict, Generic, SupportsFloat, TypeVar 
 
 ObsType = TypeVar("ObsType")
 ActType = TypeVar("ActType")
@@ -10,8 +10,16 @@ import cv2
 import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
+from gymnasium.envs.registration import register
+from gymnasium.utils.env_checker import check_env
 
 SNAKE_LEN_GOAL = 30
+
+# Register this module as a gym environment. Once registered, the id is usable in gym.make().
+register(
+    id="snake-game-v0",  # call it whatever you want
+    entry_point="snakeenv:SnekEnv",  # module_name:class_name
+)
 
 
 def collision_with_apple(apple_position, score):
@@ -54,8 +62,10 @@ class SnekEnv(gym.Env):
         self.prev_button_direction = 1
         self.button_direction = 1
         self.snake_head = [250, 250]
+        self.reward = 0
+        self.total_reward = 0
         self.prev_reward = 0
-        self.done = False
+        self.done : bool = False
         self.prev_actions = 0
 
     def step(self, action: ActType) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
@@ -126,7 +136,8 @@ class SnekEnv(gym.Env):
         observation = [head_x, head_y, apple_delta_x, apple_delta_y, snake_length] + list(self.prev_actions)
         observation = np.array(observation)
 
-        return observation, self.reward, self.done, info
+        # Return observation, reward, terminated, truncated (not used), info
+        return observation, self.reward, self.done, False, info
 
     def reset(
         self,
@@ -167,4 +178,26 @@ class SnekEnv(gym.Env):
         # Additional info to return. For debugging or whatever.
         info: Dict[str, Any] = {}
 
+        # Return observation and info
         return observation, info
+
+# For unit testing
+if __name__ == "__main__":
+    env = gym.make("snake-game-v0")
+
+    # Use this to check our custom environment
+    print("Check environment begin")
+    # check_env(env.unwrapped)
+    print("Check environment end")
+
+    # Reset environment
+    obs = env.reset()[0]
+
+    # Take some random actions
+    while True:
+        rand_action = env.action_space.sample()
+        obs, reward, terminated, truncated, info = env.step(rand_action)
+
+        if terminated:
+            obs = env.reset()[0]
+
