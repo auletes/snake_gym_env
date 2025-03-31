@@ -122,6 +122,9 @@ class SnekEnv(gym.Env):
 
         if self.done:
             self.reward = -10
+        else:
+            # self.reward  = self.score # hm apples eaten ?
+            self.reward = self.score * 10  # hm apples eaten ?
         info: Dict[str, Any] = {}
 
         head_x = self.snake_head[0]
@@ -152,6 +155,7 @@ class SnekEnv(gym.Env):
         self.snake_position = [[250, 250], [240, 250], [230, 250]]
         self.apple_position = [random.randrange(1, 50) * 10, random.randrange(1, 50) * 10]
         self.score = 0
+        self.reward = 0
         self.prev_button_direction = 1
         self.button_direction = 1
         self.snake_head = [250, 250]
