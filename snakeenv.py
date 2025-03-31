@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     # Use this to check our custom environment
     print("Check environment begin")
-    # check_env(env.unwrapped)
+    check_env(env.unwrapped)
     print("Check environment end")
 
     # Reset environment
