@@ -1,7 +1,7 @@
 import random
 import time
 from collections import deque
-from typing import TYPE_CHECKING, Any, Dict, Generic, SupportsFloat, TypeVar 
+from typing import TYPE_CHECKING, Any, Dict, Generic, SupportsFloat, TypeVar
 
 ObsType = TypeVar("ObsType")
 ActType = TypeVar("ActType")
@@ -65,7 +65,7 @@ class SnekEnv(gym.Env):
         self.reward = 0
         self.total_reward = 0
         self.prev_reward = 0
-        self.done : bool = False
+        self.done: bool = False
         self.prev_actions = 0
 
     def step(self, action: ActType) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
@@ -181,6 +181,7 @@ class SnekEnv(gym.Env):
         # Return observation and info
         return observation, info
 
+
 # For unit testing
 if __name__ == "__main__":
     env = gym.make("snake-game-v0")
@@ -200,4 +201,3 @@ if __name__ == "__main__":
 
         if terminated:
             obs = env.reset()[0]
-
